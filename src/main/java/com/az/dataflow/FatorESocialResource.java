@@ -134,7 +134,8 @@ public class FatorESocialResource {
         return FatorESocialResponse.from(existing);
     }
 
-    @GET
+    @SuppressWarnings("null")
+	@GET
     @Path("/{id}/relatorio")
     public FatorESocialRelatorioResponse relatorio(@PathParam("id") Long id) {
         FatorESocialResponse e = getById(id);
@@ -236,7 +237,7 @@ public class FatorESocialResource {
             return "-";
         }
         // ex.: "Outubro de 2025" (pt-BR)
-        java.util.Locale pt = new java.util.Locale("pt", "BR");
+        java.util.Locale pt = java.util.Locale.of("pt", "BR");
         String mes = d.getMonth().getDisplayName(java.time.format.TextStyle.FULL, pt);
         String mesCap = mes.substring(0, 1).toUpperCase(pt) + mes.substring(1);
         return mesCap + " de " + d.format(DateTimeFormatter.ofPattern("yyyy"));
