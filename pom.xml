@@ -78,6 +78,10 @@
                 <artifactId>quarkus-maven-plugin</artifactId>
                 <version>${quarkus.platform.version}</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <!-- JVM do modo dev (reduz aviso Jansi / System::load em JDK 21+) -->
+                    <jvmArgs>--enable-native-access=ALL-UNNAMED</jvmArgs>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

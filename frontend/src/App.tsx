@@ -1,5 +1,6 @@
 import {
   Calculator,
+  CircleAlert,
   FileSliders,
   LayoutDashboard,
   Menu,
@@ -10,6 +11,7 @@ import {
   Sun,
   ChevronDown,
 } from 'lucide-react'
+import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { api } from './api/client'
 import { CalculosTable } from './pages/CalculosTable'
@@ -17,9 +19,27 @@ import { FatorESocialPage } from './pages/FatorESocialPage'
 import { InssObrasPage } from './pages/InssObrasPage'
 import type { CalculoDto } from './types/calculos'
 
+function mensagemErroApi(e: unknown): string {
+  if (axios.isAxiosError(e)) {
+    const st = e.response?.status
+    if (st === 404) {
+      return 'A API respondeu 404. Em produção na Vercel, defina a variável VITE_API_BASE_URL com a URL pública do backend (ex.: https://seu-app.onrender.com), sem barra no final, e faça um novo deploy.'
+    }
+    if (st != null) {
+      return `A API respondeu HTTP ${st}. Confira se o backend está no ar e se o CORS no Quarkus inclui este domínio.`
+    }
+    if (e.code === 'ERR_NETWORK') {
+      return 'Não foi possível alcançar a API (rede/CORS). Defina VITE_API_BASE_URL na Vercel apontando para o Render e inclua este site em CORS_ORIGINS no backend.'
+    }
+    return e.message || 'Erro ao falar com a API.'
+  }
+  return 'Erro ao falar com a API.'
+}
+
 function App() {
   const [loadingLista, setLoadingLista] = useState(false)
   const [calculos, setCalculos] = useState<CalculoDto[]>([])
+  const [listaErro, setListaErro] = useState<string | null>(null)
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [simuladoresOpen, setSimuladoresOpen] = useState(true)
@@ -37,12 +57,15 @@ function App() {
 
   async function carregarCalculos() {
     setLoadingLista(true)
+    setListaErro(null)
     try {
       const { data } = await api.get<CalculoDto[]>('/calculos')
       setCalculos(Array.isArray(data) ? data : [])
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('Erro ao carregar /calculos', e)
+      setListaErro(mensagemErroApi(e))
+      setCalculos([])
     } finally {
       setLoadingLista(false)
     }
@@ -143,6 +166,24 @@ function App() {
           </div>
         </div>
       </header>
+
+      {listaErro ? (
+        <div
+          role="alert"
+          className="border-b border-amber-200/80 bg-amber-50 px-4 py-3 text-sm text-amber-950 md:px-6 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-100"
+        >
+          <div className="mx-auto flex max-w-6xl gap-3">
+            <CircleAlert
+              className="mt-0.5 size-5 shrink-0 text-amber-700 dark:text-amber-300"
+              aria-hidden="true"
+            />
+            <div className="min-w-0 space-y-1">
+              <p className="font-semibold">Não foi possível carregar os dados</p>
+              <p className="text-amber-900/90 dark:text-amber-50/90">{listaErro}</p>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* Overlay mobile */}
       {sidebarOpen ? (

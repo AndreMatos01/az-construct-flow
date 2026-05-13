@@ -1,0 +1,12 @@
+# Postgres local para ./mvnw quarkus:dev (perfil dev usa localhost:5432 por padrão).
+# Subir antes do backend: docker compose up -d
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: az-construct-flow-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
