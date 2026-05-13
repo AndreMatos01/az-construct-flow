@@ -1,5 +1,20 @@
-*
-!target/*-runner
-!target/*-runner.jar
-!target/lib/*
-!target/quarkus-app/*
+# O padrão anterior ("*" + só !target/...) impedia copiar pom.xml e src/,
+# quebrando "RUN mvn clean package" na imagem de build.
+
+.git
+.gitignore
+**/.cursor
+.idea
+.vscode
+*.iml
+
+# Frontend não entra na imagem só-API (ajuste se passar a servir o dist pelo Quarkus)
+frontend/node_modules
+frontend/dist
+
+# Evita copiar build local; o Maven roda de novo no container
+target
+
+.env
+.env.*
+*.log
