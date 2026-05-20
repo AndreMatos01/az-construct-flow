@@ -2,11 +2,10 @@ import type { ReactNode } from 'react'
 import { ApiErrorBanner } from './ApiErrorBanner'
 import { AppFooter } from './AppFooter'
 import { AppHeader } from './AppHeader'
-import { AppSidebar, type AppMenuId } from './AppSidebar'
+import { AppSidebar } from './AppSidebar'
 
 type Props = {
   children: ReactNode
-  activeMenu: AppMenuId
   subtitle: string
   tema: 'dark' | 'light'
   loading: boolean
@@ -14,14 +13,12 @@ type Props = {
   sidebarOpen: boolean
   onOpenMenu: () => void
   onCloseSidebar: () => void
-  onNavigate: (menu: AppMenuId) => void
   onToggleTema: () => void
   onRefresh: () => void
 }
 
 export function AppShell({
   children,
-  activeMenu,
   subtitle,
   tema,
   loading,
@@ -29,7 +26,6 @@ export function AppShell({
   sidebarOpen,
   onOpenMenu,
   onCloseSidebar,
-  onNavigate,
   onToggleTema,
   onRefresh,
 }: Props) {
@@ -47,12 +43,7 @@ export function AppShell({
       {apiError ? <ApiErrorBanner message={apiError} /> : null}
 
       <div className="flex w-full">
-        <AppSidebar
-          activeMenu={activeMenu}
-          open={sidebarOpen}
-          onNavigate={onNavigate}
-          onClose={onCloseSidebar}
-        />
+        <AppSidebar open={sidebarOpen} onClose={onCloseSidebar} />
 
         <div className="flex min-w-0 flex-1 flex-col">
           <main className="w-full p-0">{children}</main>
@@ -63,5 +54,3 @@ export function AppShell({
     </div>
   )
 }
-
-export type { AppMenuId }
