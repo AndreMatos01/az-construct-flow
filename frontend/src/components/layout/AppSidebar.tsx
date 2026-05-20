@@ -1,37 +1,32 @@
-import {
-  Calculator,
-  ChevronDown,
-  FileSliders,
-  LayoutDashboard,
-  Scale,
-} from 'lucide-react'
+import { ChevronDown, Scale } from 'lucide-react'
 import { useState } from 'react'
-
-export type AppMenuId = 'dash' | 'fator-esocial' | 'inss-obras'
+import { NavLink } from 'react-router-dom'
+import { ROOT_ROUTES, SIMULADOR_ROUTES } from '../../routes/config'
 
 type Props = {
-  activeMenu: AppMenuId
   open: boolean
-  onNavigate: (menu: AppMenuId) => void
   onClose: () => void
 }
 
-function navButtonClass(active: boolean, variant: 'sky' | 'neutral' = 'sky') {
+function navLinkClass(active: boolean, variant: 'sky' | 'neutral' = 'sky') {
+  const base =
+    'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition'
   if (active) {
-    return variant === 'sky'
-      ? 'bg-sky-600/10 text-sky-900 ring-1 ring-sky-600/15 dark:bg-sky-400/10 dark:text-sky-100 dark:ring-sky-300/20'
-      : 'bg-slate-900/5 text-slate-900 ring-1 ring-slate-200/70 dark:bg-white/5 dark:text-slate-100 dark:ring-white/10'
+    return [
+      base,
+      variant === 'sky'
+        ? 'bg-sky-600/10 text-sky-900 ring-1 ring-sky-600/15 dark:bg-sky-400/10 dark:text-sky-100 dark:ring-sky-300/20'
+        : 'bg-slate-900/5 text-slate-900 ring-1 ring-slate-200/70 dark:bg-white/5 dark:text-slate-100 dark:ring-white/10',
+    ].join(' ')
   }
-  return 'text-slate-700 hover:bg-slate-900/5 dark:text-slate-200 dark:hover:bg-white/5'
+  return [
+    base,
+    'text-slate-700 hover:bg-slate-900/5 dark:text-slate-200 dark:hover:bg-white/5',
+  ].join(' ')
 }
 
-export function AppSidebar({ activeMenu, open, onNavigate, onClose }: Props) {
+export function AppSidebar({ open, onClose }: Props) {
   const [simuladoresOpen, setSimuladoresOpen] = useState(true)
-
-  function navigate(menu: AppMenuId) {
-    onNavigate(menu)
-    onClose()
-  }
 
   return (
     <>
@@ -54,17 +49,22 @@ export function AppSidebar({ activeMenu, open, onNavigate, onClose }: Props) {
       >
         <nav className="px-3 py-3">
           <div className="space-y-1">
-            <button
-              type="button"
-              onClick={() => navigate('dash')}
-              className={[
-                'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition',
-                navButtonClass(activeMenu === 'dash'),
-              ].join(' ')}
-            >
-              <LayoutDashboard className="size-4" aria-hidden="true" />
-              Dash
-            </button>
+            {ROOT_ROUTES.map((route) => {
+              const Icon = route.icon
+              return (
+                <NavLink
+                  key={route.id}
+                  to={route.path}
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    navLinkClass(isActive, route.navVariant ?? 'sky')
+                  }
+                >
+                  <Icon className="size-4" aria-hidden="true" />
+                  {route.label === 'Dashboard' ? 'Dash' : route.label}
+                </NavLink>
+              )
+            })}
           </div>
 
           <div className="mt-4">
@@ -92,29 +92,22 @@ export function AppSidebar({ activeMenu, open, onNavigate, onClose }: Props) {
 
             {simuladoresOpen ? (
               <div className="mt-1 space-y-1 pl-1">
-                <button
-                  type="button"
-                  onClick={() => navigate('inss-obras')}
-                  className={[
-                    'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition',
-                    navButtonClass(activeMenu === 'inss-obras', 'neutral'),
-                  ].join(' ')}
-                >
-                  <Calculator className="size-4" aria-hidden="true" />
-                  Obras contratuais
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => navigate('fator-esocial')}
-                  className={[
-                    'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition',
-                    navButtonClass(activeMenu === 'fator-esocial'),
-                  ].join(' ')}
-                >
-                  <FileSliders className="size-4" aria-hidden="true" />
-                  Fator de Ajuste eSocial
-                </button>
+                {SIMULADOR_ROUTES.map((route) => {
+                  const Icon = route.icon
+                  return (
+                    <NavLink
+                      key={route.id}
+                      to={route.path}
+                      onClick={onClose}
+                      className={({ isActive }) =>
+                        navLinkClass(isActive, route.navVariant ?? 'sky')
+                      }
+                    >
+                      <Icon className="size-4" aria-hidden="true" />
+                      {route.label}
+                    </NavLink>
+                  )
+                })}
               </div>
             ) : null}
           </div>
@@ -128,10 +121,4 @@ export function AppSidebar({ activeMenu, open, onNavigate, onClose }: Props) {
       </aside>
     </>
   )
-}
-
-export const MENU_SUBTITLES: Record<AppMenuId, string> = {
-  dash: 'Dashboard',
-  'inss-obras': 'Obras contratuais',
-  'fator-esocial': 'Fator de Ajuste eSocial',
 }
