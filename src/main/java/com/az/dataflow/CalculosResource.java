@@ -1,5 +1,6 @@
 package com.az.dataflow;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
@@ -19,9 +20,6 @@ import jakarta.validation.Valid;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class CalculosResource {
-
-    private static final double PERCENTUAL_BASE_INSS = 0.40d;
-    private static final double ALIQUOTA_INSS = 0.11d;
 
     @GET
     public List<CalculoObra> listar() {
@@ -63,17 +61,20 @@ public class CalculosResource {
         if (req == null) {
             throw new BadRequestException("Body JSON é obrigatório.");
         }
-        CalculoObra calculo = new CalculoObra();
-        calculo.nomeObra = req.nomeObra();
-        calculo.valorContrato = req.valorContrato();
-        calculo.inssEstimado = req.inssEstimado();
+        BigDecimal vc = BigDecimal.valueOf(req.valorContrato());
+        BigDecimal mat = req.valorMateriais() != null ? BigDecimal.valueOf(req.valorMateriais()) : BigDecimal.ZERO;
+        BigDecimal pct = req.percentualBase() != null ? BigDecimal.valueOf(req.percentualBase()) : null;
+        BigDecimal ali = req.aliquotaInss() != null ? BigDecimal.valueOf(req.aliquotaInss()) : null;
 
-        if (calculo.inssEstimado == null) {
-            calculo.inssEstimado = calculo.valorContrato * PERCENTUAL_BASE_INSS * ALIQUOTA_INSS;
+        final InssObraConstrucaoCivil.Result r;
+        try {
+            r = InssObraConstrucaoCivil.calcular(vc, mat, pct, ali);
+        } catch (IllegalArgumentException ex) {
+            throw new BadRequestException(ex.getMessage());
         }
 
+        CalculoObra calculo = CalculoObra.from(req.nomeObra(), r);
         calculo.persist();
         return CalculoObraResponse.from(calculo);
     }
 }
-

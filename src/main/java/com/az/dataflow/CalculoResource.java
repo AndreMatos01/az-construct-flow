@@ -1,7 +1,6 @@
 package com.az.dataflow;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
@@ -14,12 +13,13 @@ import jakarta.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class CalculoResource {
 
-    private static final BigDecimal PERCENTUAL_BASE_INSS = new BigDecimal("0.40");
-    private static final BigDecimal ALIQUOTA_INSS = new BigDecimal("0.11");
-
     @GET
     @Path("/restituicao-inss")
-    public RestituicaoInssResponse calcularRestituicaoInss(@QueryParam("valorContrato") BigDecimal valorContrato) {
+    public RestituicaoInssResponse calcularRestituicaoInss(
+            @QueryParam("valorContrato") BigDecimal valorContrato,
+            @QueryParam("valorMateriais") BigDecimal valorMateriais,
+            @QueryParam("percentualBase") BigDecimal percentualBase,
+            @QueryParam("aliquotaInss") BigDecimal aliquotaInss) {
         if (valorContrato == null) {
             throw new BadRequestException("Informe o parâmetro 'valorContrato'.");
         }
@@ -27,17 +27,30 @@ public class CalculoResource {
             throw new BadRequestException("'valorContrato' não pode ser negativo.");
         }
 
-        BigDecimal baseCalculo = valorContrato.multiply(PERCENTUAL_BASE_INSS);
-        BigDecimal restitucao = baseCalculo.multiply(ALIQUOTA_INSS);
+        final InssObraConstrucaoCivil.Result r;
+        try {
+            r = InssObraConstrucaoCivil.calcular(valorContrato, valorMateriais, percentualBase, aliquotaInss);
+        } catch (IllegalArgumentException ex) {
+            throw new BadRequestException(ex.getMessage());
+        }
 
         return new RestituicaoInssResponse(
-                valorContrato.setScale(2, RoundingMode.HALF_UP),
-                baseCalculo.setScale(2, RoundingMode.HALF_UP),
-                restitucao.setScale(2, RoundingMode.HALF_UP)
-        );
+                r.valorContrato(),
+                r.valorMateriais(),
+                r.valorConsiderado(),
+                r.percentualBase(),
+                r.aliquotaInss(),
+                r.baseInss(),
+                r.inss());
     }
 
-    public record RestituicaoInssResponse(BigDecimal valorContrato, BigDecimal baseCalculo, BigDecimal restitucaoInss) {
+    public record RestituicaoInssResponse(
+            BigDecimal valorContrato,
+            BigDecimal valorMateriais,
+            BigDecimal valorConsiderado,
+            BigDecimal percentualBase,
+            BigDecimal aliquotaInss,
+            BigDecimal baseCalculo,
+            BigDecimal restituicaoInss) {
     }
 }
-

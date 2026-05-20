@@ -1,16 +1,36 @@
 import { Loader2 } from 'lucide-react'
 import type { CalculoDto } from '../types/calculos'
 import { brl } from '../utils/format'
-import { calcularRestituicaoInss } from '../utils/inss'
+import { calcularInssObra } from '../utils/inss'
 
 type Props = {
   calculos: CalculoDto[]
   loading?: boolean
 }
 
+function inssExibido(c: CalculoDto): number {
+  if (c.inssEstimado != null) return c.inssEstimado
+  return calcularInssObra({
+    valorContrato: c.valorContrato ?? 0,
+    valorMateriais: c.valorMateriais ?? undefined,
+    percentualBase: c.percentualBase ?? undefined,
+    aliquotaInss: c.aliquotaInss ?? undefined,
+  }).inss
+}
+
+function baseExibida(c: CalculoDto): number {
+  if (c.baseInss != null) return c.baseInss
+  return calcularInssObra({
+    valorContrato: c.valorContrato ?? 0,
+    valorMateriais: c.valorMateriais ?? undefined,
+    percentualBase: c.percentualBase ?? undefined,
+    aliquotaInss: c.aliquotaInss ?? undefined,
+  }).baseInss
+}
+
 export function CalculosTable({ calculos, loading }: Props) {
   return (
-    <section className="md:col-span-3">
+    <section className="col-span-full">
       <div className="rounded-2xl bg-white ring-1 ring-slate-200/70 dark:bg-white/5 dark:ring-white/10">
         <div className="flex items-center justify-between gap-4 border-b border-slate-200/70 p-5 dark:border-white/10">
           <div>
@@ -32,12 +52,14 @@ export function CalculosTable({ calculos, loading }: Props) {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[640px] text-left text-sm">
             <thead className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
               <tr className="border-b border-slate-200/70 dark:border-white/10">
                 <th className="px-5 py-3 font-medium">Obra</th>
                 <th className="px-5 py-3 font-medium">Contrato</th>
-                <th className="px-5 py-3 font-medium">INSS estimado</th>
+                <th className="px-5 py-3 font-medium">Mat.</th>
+                <th className="px-5 py-3 font-medium">Base</th>
+                <th className="px-5 py-3 font-medium">INSS</th>
                 <th className="px-5 py-3 font-medium">Criado em</th>
               </tr>
             </thead>
@@ -46,7 +68,7 @@ export function CalculosTable({ calculos, loading }: Props) {
                 <tr>
                   <td
                     className="px-5 py-6 text-slate-500 dark:text-slate-400"
-                    colSpan={4}
+                    colSpan={6}
                   >
                     Nenhum cálculo encontrado.
                   </td>
@@ -64,10 +86,13 @@ export function CalculosTable({ calculos, loading }: Props) {
                       {brl.format(c.valorContrato ?? 0)}
                     </td>
                     <td className="px-5 py-3 text-slate-700 dark:text-slate-200">
-                      {brl.format(
-                        c.inssEstimado ??
-                          calcularRestituicaoInss(c.valorContrato ?? 0),
-                      )}
+                      {brl.format(c.valorMateriais ?? 0)}
+                    </td>
+                    <td className="px-5 py-3 text-slate-700 dark:text-slate-200">
+                      {brl.format(baseExibida(c))}
+                    </td>
+                    <td className="px-5 py-3 text-slate-700 dark:text-slate-200">
+                      {brl.format(inssExibido(c))}
                     </td>
                     <td className="px-5 py-3 text-slate-500 dark:text-slate-400">
                       {c.dataCriacao
@@ -84,4 +109,3 @@ export function CalculosTable({ calculos, loading }: Props) {
     </section>
   )
 }
-
