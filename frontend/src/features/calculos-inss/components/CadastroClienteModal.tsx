@@ -1,9 +1,7 @@
 import { Loader2, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import {
-  ObraFormField,
-  obraFormInputClass,
-} from '@/features/calculos-inss/components/ObraInssFormFields'
+import { ObraFormField } from '@/features/calculos-inss/components/ObraInssFormFields'
+import { obraFormInputClass } from '@/features/calculos-inss/components/obraFormStyles'
 import {
   validarDocumentoCpfOuCnpj,
   validarEmail,
@@ -20,14 +18,12 @@ export type NovoCliente = {
 }
 
 type Props = {
-  open: boolean
   onClose: () => void
   onSalvar: (cliente: NovoCliente) => void | Promise<void>
   salvando?: boolean
 }
 
 export function CadastroClienteModal({
-  open,
   onClose,
   onSalvar,
   salvando = false,
@@ -39,22 +35,12 @@ export function CadastroClienteModal({
   const [submetido, setSubmetido] = useState(false)
 
   useEffect(() => {
-    if (!open) return
-    setNome('')
-    setDocumento('')
-    setEmail('')
-    setTelefone('')
-    setSubmetido(false)
-  }, [open])
-
-  useEffect(() => {
-    if (!open) return
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape' && !salvando) onClose()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [open, onClose, salvando])
+  }, [onClose, salvando])
 
   const erros = useMemo(() => {
     const doc = validarDocumentoCpfOuCnpj(documento)
@@ -72,8 +58,6 @@ export function CadastroClienteModal({
   }
 
   const formularioInvalido = Boolean(erros.nome || erros.documento || erros.email)
-
-  if (!open) return null
 
   async function handleSalvar() {
     setSubmetido(true)

@@ -15,7 +15,6 @@ export function useCalculos() {
     try {
       setCalculos(await fetchCalculos())
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error('Erro ao carregar /calculos', e)
       setError(mensagemErroApi(e))
       setCalculos([])
@@ -25,6 +24,8 @@ export function useCalculos() {
   }, [])
 
   useEffect(() => {
+    // Busca inicial dos dados ao montar; o setState aqui é intencional.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refetch()
   }, [refetch])
 

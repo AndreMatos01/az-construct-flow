@@ -6,9 +6,11 @@ import {
   ObraFormAccordion,
   ObraFormAccordionTrigger,
   ObraFormField,
+} from '@/features/calculos-inss/components/ObraInssFormFields'
+import {
   obraFormInputClass,
   obraFormSelectClass,
-} from '@/features/calculos-inss/components/ObraInssFormFields'
+} from '@/features/calculos-inss/components/obraFormStyles'
 import {
   CATEGORIAS_OBRA,
   CONCRETO_USINADO,
@@ -162,7 +164,6 @@ export function InssObrasForm({ onAfterSave }: Props) {
       setResultadoVisivel(true)
       await onAfterSave?.()
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error('Erro ao salvar POST /calculos', e)
       setErro(
         'Não foi possível calcular/salvar. Verifique o backend e os dados informados.',
@@ -235,28 +236,29 @@ export function InssObrasForm({ onAfterSave }: Props) {
             onClick={() => setModalCadastroCliente(true)}
           />
 
-          <CadastroClienteModal
-            open={modalCadastroCliente}
-            onClose={() => setModalCadastroCliente(false)}
-            salvando={salvandoCliente}
-            onSalvar={async (novo) => {
-              setSalvandoCliente(true)
-              try {
-                const id = `local-${Date.now()}`
-                const doc = novo.documento
-                const label = `${novo.nome} — ${doc.length > 6 ? `${doc.slice(0, 3)}***` : doc}`
-                setClientes((lista) => [
-                  { value: id, label },
-                  ...lista,
-                ])
-                setClienteId(id)
-                setAccordionClienteCadastrado(true)
-                setModalCadastroCliente(false)
-              } finally {
-                setSalvandoCliente(false)
-              }
-            }}
-          />
+          {modalCadastroCliente ? (
+            <CadastroClienteModal
+              onClose={() => setModalCadastroCliente(false)}
+              salvando={salvandoCliente}
+              onSalvar={async (novo) => {
+                setSalvandoCliente(true)
+                try {
+                  const id = `local-${Date.now()}`
+                  const doc = novo.documento
+                  const label = `${novo.nome} — ${doc.length > 6 ? `${doc.slice(0, 3)}***` : doc}`
+                  setClientes((lista) => [
+                    { value: id, label },
+                    ...lista,
+                  ])
+                  setClienteId(id)
+                  setAccordionClienteCadastrado(true)
+                  setModalCadastroCliente(false)
+                } finally {
+                  setSalvandoCliente(false)
+                }
+              }}
+            />
+          ) : null}
 
           <div className="grid gap-4 md:grid-cols-3">
             <ObraFormField

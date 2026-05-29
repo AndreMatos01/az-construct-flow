@@ -13,7 +13,6 @@ if (import.meta.env.PROD && typeof window !== 'undefined') {
     host.endsWith('netlify.app') ||
     host === 'pages.dev'
   if (isStaticHost && getApiBaseUrl() === '/api') {
-    // eslint-disable-next-line no-console
     console.warn(
       '[AZ ConstructFlow] Em produção no host estático, /api não existe. Defina VITE_API_BASE_URL na Vercel (URL HTTPS do Quarkus no Render) e faça redeploy.',
     )

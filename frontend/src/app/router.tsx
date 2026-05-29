@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { ObrasContratuaisPage } from '@/features/calculos-inss/pages/ObrasContratuaisPage'
-import { FatorESocialPage } from '@/pages/FatorESocialPage'
+import { FatorEsocialPage } from '@/features/fator-esocial/pages/FatorEsocialPage'
 import { DEFAULT_ROUTE_PATH } from '@/config/routes'
 
 export function AppRouter() {
@@ -13,7 +13,7 @@ export function AppRouter() {
         path="/esocial"
         element={
           <div className="mx-auto w-full max-w-6xl px-3 py-4 sm:px-4 md:px-6">
-            <FatorESocialPage />
+            <FatorEsocialPage />
           </div>
         }
       />
