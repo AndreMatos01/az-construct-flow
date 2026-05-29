@@ -15,6 +15,12 @@ const FatorEsocialPage = lazy(() =>
   })),
 )
 
+const CalculoSeroPage = lazy(() =>
+  import('@/features/calculo-sero').then((m) => ({
+    default: m.CalculoSeroPage,
+  })),
+)
+
 function RouteFallback() {
   return (
     <div
@@ -43,6 +49,7 @@ export function AppRouter() {
             </div>
           }
         />
+        <Route path="/sero" element={<CalculoSeroPage />} />
         <Route path="*" element={<Navigate to={DEFAULT_ROUTE_PATH} replace />} />
       </Routes>
     </Suspense>

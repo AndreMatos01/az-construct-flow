@@ -1,11 +1,12 @@
 import {
   Calculator,
+  Coins,
   FileSliders,
   LayoutDashboard,
   type LucideIcon,
 } from 'lucide-react'
 
-export type RouteId = 'dash' | 'inss-obras' | 'fator-esocial'
+export type RouteId = 'dash' | 'inss-obras' | 'fator-esocial' | 'calculo-sero'
 
 export type RouteConfig = {
   id: RouteId
@@ -37,6 +38,13 @@ export const ROUTES: RouteConfig[] = [
     path: '/esocial',
     label: 'Fator de Ajuste eSocial',
     icon: FileSliders,
+    group: 'simuladores',
+  },
+  {
+    id: 'calculo-sero',
+    path: '/sero',
+    label: 'Valor SERO',
+    icon: Coins,
     group: 'simuladores',
   },
 ]

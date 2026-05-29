@@ -13,3 +13,9 @@ export const fatorEsocialKeys = {
   list: (params: FatorEsocialListParams) =>
     ['fator-esocial', 'list', params] as const,
 }
+
+export const calculoSeroKeys = {
+  all: ['calculo-sero'] as const,
+  list: (params: Record<string, unknown>) =>
+    ['calculo-sero', 'list', params] as const,
+}
