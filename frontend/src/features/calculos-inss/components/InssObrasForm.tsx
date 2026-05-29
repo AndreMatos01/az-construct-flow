@@ -1,12 +1,8 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { CircleAlert, Loader2, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { createCalculo } from '@/features/calculos-inss/api/calculosApi'
 import { CadastroClienteModal } from '@/features/calculos-inss/components/CadastroClienteModal'
-import {
-  ObraFormAccordion,
-  ObraFormAccordionTrigger,
-  ObraFormField,
-} from '@/features/calculos-inss/components/ObraInssFormFields'
 import {
   obraFormInputClass,
   obraFormSelectClass,
@@ -24,10 +20,13 @@ import {
 import { CLIENTES_MOCK } from '@/features/calculos-inss/mocks/clientes'
 import type { CreateCalculoObraPayload } from '@/features/calculos-inss/types/calculo.types'
 import { calcularInssObra } from '@/features/calculos-inss/utils/inss'
+import {
+  FormAccordion,
+  FormAccordionTrigger,
+  FormField,
+} from '@/shared/components/ui'
 import { brl, parsePtBrNumber } from '@/shared/lib/format'
-type Props = {
-  onAfterSave?: () => Promise<void> | void
-}
+import { calculosKeys } from '@/shared/lib/queryKeys'
 
 const MSG_OBRIGATORIO = 'Este campo é obrigatório'
 
@@ -38,7 +37,8 @@ function parsePercent(s: string, fallback: number): number {
   return Number.isFinite(n) && n > 0 ? n : fallback
 }
 
-export function InssObrasForm({ onAfterSave }: Props) {
+export function InssObrasForm() {
+  const queryClient = useQueryClient()
   const [identificador, setIdentificador] = useState('')
   const [clienteId, setClienteId] = useState('')
   const [accordionClienteCadastrado, setAccordionClienteCadastrado] = useState(true)
@@ -162,7 +162,7 @@ export function InssObrasForm({ onAfterSave }: Props) {
       }
       await createCalculo(payload)
       setResultadoVisivel(true)
-      await onAfterSave?.()
+      await queryClient.invalidateQueries({ queryKey: calculosKeys.all })
     } catch (e) {
       console.error('Erro ao salvar POST /calculos', e)
       setErro(
@@ -194,7 +194,7 @@ export function InssObrasForm({ onAfterSave }: Props) {
         </div>
 
         <div className="mt-5 space-y-4">
-          <ObraFormField
+          <FormField
             label="Identificador do registro:"
             required
             info
@@ -207,14 +207,14 @@ export function InssObrasForm({ onAfterSave }: Props) {
               placeholder="Identificador da obra"
               className={obraFormInputClass}
             />
-          </ObraFormField>
+          </FormField>
 
-          <ObraFormAccordion
+          <FormAccordion
             title="Usar cliente já cadastrado"
             open={accordionClienteCadastrado}
             onToggle={() => setAccordionClienteCadastrado((v) => !v)}
           >
-            <ObraFormField label="Cliente" required error={campoErro('cliente')}>
+            <FormField label="Cliente" required error={campoErro('cliente')}>
               <select
                 value={clienteId}
                 onChange={(e) => setClienteId(e.target.value)}
@@ -227,10 +227,10 @@ export function InssObrasForm({ onAfterSave }: Props) {
                   </option>
                 ))}
               </select>
-            </ObraFormField>
-          </ObraFormAccordion>
+            </FormField>
+          </FormAccordion>
 
-          <ObraFormAccordionTrigger
+          <FormAccordionTrigger
             title="Cadastrar novo cliente"
             trailingIcon="plus"
             onClick={() => setModalCadastroCliente(true)}
@@ -261,7 +261,7 @@ export function InssObrasForm({ onAfterSave }: Props) {
           ) : null}
 
           <div className="grid gap-4 md:grid-cols-3">
-            <ObraFormField
+            <FormField
               label="Selecione seu estado:"
               required
               error={campoErro('estado')}
@@ -277,9 +277,9 @@ export function InssObrasForm({ onAfterSave }: Props) {
                   </option>
                 ))}
               </select>
-            </ObraFormField>
+            </FormField>
 
-            <ObraFormField
+            <FormField
               label="Selecione o tipo do responsável:"
               required
               error={campoErro('tipoResponsavel')}
@@ -295,9 +295,9 @@ export function InssObrasForm({ onAfterSave }: Props) {
                   </option>
                 ))}
               </select>
-            </ObraFormField>
+            </FormField>
 
-            <ObraFormField
+            <FormField
               label="Utilizou NF de pré moldado acima de 40% COD?"
               required
               info
@@ -314,11 +314,11 @@ export function InssObrasForm({ onAfterSave }: Props) {
                   </option>
                 ))}
               </select>
-            </ObraFormField>
+            </FormField>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <ObraFormField label="Data de início da obra:">
+            <FormField label="Data de início da obra:">
               <input
                 type="date"
                 value={dataInicio}
@@ -326,8 +326,8 @@ export function InssObrasForm({ onAfterSave }: Props) {
                 className={obraFormInputClass}
                 placeholder="dd/mm/aaaa"
               />
-            </ObraFormField>
-            <ObraFormField label="Data de término da obra:">
+            </FormField>
+            <FormField label="Data de término da obra:">
               <input
                 type="date"
                 value={dataTermino}
@@ -335,12 +335,12 @@ export function InssObrasForm({ onAfterSave }: Props) {
                 className={obraFormInputClass}
                 placeholder="dd/mm/aaaa"
               />
-            </ObraFormField>
+            </FormField>
           </div>
 
           <div className="rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200/70 dark:bg-slate-950/40 dark:ring-white/10">
             <div className="grid gap-4 lg:grid-cols-[1fr_1fr_0.9fr_1fr_0.9fr_auto] lg:items-end">
-              <ObraFormField
+              <FormField
                 label="Selecione a destinação:"
                 required
                 info
@@ -358,9 +358,9 @@ export function InssObrasForm({ onAfterSave }: Props) {
                     </option>
                   ))}
                 </select>
-              </ObraFormField>
+              </FormField>
 
-              <ObraFormField
+              <FormField
                 label="Tipo de obra:"
                 required
                 info
@@ -378,9 +378,9 @@ export function InssObrasForm({ onAfterSave }: Props) {
                     </option>
                   ))}
                 </select>
-              </ObraFormField>
+              </FormField>
 
-              <ObraFormField
+              <FormField
                 label="Área principal:"
                 required
                 info
@@ -398,9 +398,9 @@ export function InssObrasForm({ onAfterSave }: Props) {
                     m²
                   </span>
                 </div>
-              </ObraFormField>
+              </FormField>
 
-              <ObraFormField
+              <FormField
                 label="Selecione a categoria:"
                 required
                 info
@@ -418,9 +418,9 @@ export function InssObrasForm({ onAfterSave }: Props) {
                     </option>
                   ))}
                 </select>
-              </ObraFormField>
+              </FormField>
 
-              <ObraFormField
+              <FormField
                 label="Concreto usinado:"
                 required
                 info
@@ -437,7 +437,7 @@ export function InssObrasForm({ onAfterSave }: Props) {
                     </option>
                   ))}
                 </select>
-              </ObraFormField>
+              </FormField>
 
               <button
                 type="button"
@@ -450,13 +450,13 @@ export function InssObrasForm({ onAfterSave }: Props) {
             </div>
           </div>
 
-          <ObraFormAccordion
+          <FormAccordion
             title="Áreas Complementares"
             open={accordionAreas}
             onToggle={() => setAccordionAreas((v) => !v)}
           >
             <div className="grid gap-4 sm:grid-cols-2">
-              <ObraFormField label="Valor total do contrato (R$):" required>
+              <FormField label="Valor total do contrato (R$):" required>
                 <input
                   inputMode="decimal"
                   value={valorContratoStr}
@@ -464,8 +464,8 @@ export function InssObrasForm({ onAfterSave }: Props) {
                   placeholder="Ex.: 1.500.000,00"
                   className={obraFormInputClass}
                 />
-              </ObraFormField>
-              <ObraFormField label="Materiais segregados no contrato (R$):">
+              </FormField>
+              <FormField label="Materiais segregados no contrato (R$):">
                 <input
                   inputMode="decimal"
                   value={valorMateriaisStr}
@@ -473,8 +473,8 @@ export function InssObrasForm({ onAfterSave }: Props) {
                   placeholder="0"
                   className={obraFormInputClass}
                 />
-              </ObraFormField>
-              <ObraFormField label="Percentual da base (%):">
+              </FormField>
+              <FormField label="Percentual da base (%):">
                 <input
                   inputMode="decimal"
                   value={percentualBaseStr}
@@ -482,8 +482,8 @@ export function InssObrasForm({ onAfterSave }: Props) {
                   placeholder="40"
                   className={obraFormInputClass}
                 />
-              </ObraFormField>
-              <ObraFormField label="Alíquota INSS sobre a base (%):">
+              </FormField>
+              <FormField label="Alíquota INSS sobre a base (%):">
                 <input
                   inputMode="decimal"
                   value={aliquotaInssStr}
@@ -491,9 +491,9 @@ export function InssObrasForm({ onAfterSave }: Props) {
                   placeholder="11"
                   className={obraFormInputClass}
                 />
-              </ObraFormField>
+              </FormField>
             </div>
-          </ObraFormAccordion>
+          </FormAccordion>
 
           {resultadoVisivel && valorContrato > 0 ? (
             <div className="rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200/70 dark:bg-slate-950/40 dark:ring-white/10">

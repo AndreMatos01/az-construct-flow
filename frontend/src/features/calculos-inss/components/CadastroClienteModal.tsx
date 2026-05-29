@@ -1,7 +1,7 @@
 import { Loader2, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { ObraFormField } from '@/features/calculos-inss/components/ObraInssFormFields'
 import { obraFormInputClass } from '@/features/calculos-inss/components/obraFormStyles'
+import { FormField } from '@/shared/components/ui'
 import {
   validarDocumentoCpfOuCnpj,
   validarEmail,
@@ -114,7 +114,7 @@ export function CadastroClienteModal({
             void handleSalvar()
           }}
         >
-          <ObraFormField
+          <FormField
             label="Nome do cliente:"
             required
             error={campoErro('nome')}
@@ -127,9 +127,9 @@ export function CadastroClienteModal({
               className={obraFormInputClass}
               autoFocus
             />
-          </ObraFormField>
+          </FormField>
 
-          <ObraFormField
+          <FormField
             label="CPF / CNPJ:"
             required
             error={campoErro('documento')}
@@ -141,9 +141,9 @@ export function CadastroClienteModal({
               placeholder="000.000.000-00 ou 00.000.000/0000-00"
               className={obraFormInputClass}
             />
-          </ObraFormField>
+          </FormField>
 
-          <ObraFormField label="E-mail:" error={campoErro('email')}>
+          <FormField label="E-mail:" error={campoErro('email')}>
             <input
               type="email"
               value={email}
@@ -152,9 +152,9 @@ export function CadastroClienteModal({
               className={obraFormInputClass}
               autoComplete="email"
             />
-          </ObraFormField>
+          </FormField>
 
-          <ObraFormField label="Telefone:">
+          <FormField label="Telefone:">
             <input
               type="tel"
               value={telefone}
@@ -162,7 +162,7 @@ export function CadastroClienteModal({
               placeholder="(00) 00000-0000"
               className={obraFormInputClass}
             />
-          </ObraFormField>
+          </FormField>
 
           <div className="flex flex-col-reverse gap-2 border-t border-slate-200/70 pt-4 sm:flex-row sm:justify-end dark:border-white/10">
             <button

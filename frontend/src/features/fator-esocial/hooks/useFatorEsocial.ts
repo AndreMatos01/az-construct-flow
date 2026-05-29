@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
+import { fatorEsocialKeys } from '@/shared/lib/queryKeys'
 import {
   createSimulacao,
   deleteRegistro,
@@ -8,110 +15,104 @@ import {
 import type {
   AtualizarRegistroPayload,
   CriarSimulacaoPayload,
-  FatorESocialRow,
 } from '../types/fatorEsocial.types'
 
 export function useFatorEsocial() {
+  const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [perPage, setPerPage] = useState(10)
   const [page, setPage] = useState(1)
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [rows, setRows] = useState<FatorESocialRow[]>([])
-  const [total, setTotal] = useState(0)
-
-  const totalPages = Math.max(1, Math.ceil(total / perPage))
-  const safePage = Math.min(page, totalPages)
-
-  const carregar = useCallback(async () => {
-    setError(null)
-    setLoading(true)
-    try {
-      const data = await fetchFatorEsocial({ q: search, page: safePage, perPage })
-      setRows(data.items)
-      setTotal(data.total)
-    } catch (e) {
-      console.error('Erro ao carregar /fator-esocial', e)
-      setError('Não foi possível carregar os registros do eSocial.')
-      setRows([])
-      setTotal(0)
-    } finally {
-      setLoading(false)
-    }
-  }, [search, safePage, perPage])
-
-  useEffect(() => {
-    // Busca os dados quando a paginação muda; o setState aqui é intencional.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void carregar()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPage, safePage])
 
   useEffect(() => {
     const t = window.setTimeout(() => {
+      setDebouncedSearch(search)
       setPage(1)
-      void carregar()
     }, 350)
     return () => window.clearTimeout(t)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search])
 
-  const criar = useCallback(
-    async (payload: CriarSimulacaoPayload): Promise<boolean> => {
-      setError(null)
-      setLoading(true)
-      try {
-        await createSimulacao(payload)
-        await carregar()
-        return true
-      } catch (e) {
-        console.error('Erro ao criar POST /fator-esocial', e)
-        setError('Não foi possível salvar a simulação.')
-        return false
-      } finally {
-        setLoading(false)
-      }
-    },
-    [carregar],
-  )
+  const params = { q: debouncedSearch, page, perPage }
+  const query = useQuery({
+    queryKey: fatorEsocialKeys.list(params),
+    queryFn: () => fetchFatorEsocial(params),
+    placeholderData: keepPreviousData,
+  })
 
-  const atualizar = useCallback(
-    async (id: number, payload: AtualizarRegistroPayload): Promise<boolean> => {
-      setError(null)
-      setLoading(true)
-      try {
-        await updateRegistro(id, payload)
-        await carregar()
-        return true
-      } catch (e) {
-        console.error('Erro ao editar PUT /fator-esocial/{id}', e)
-        setError('Não foi possível salvar a edição.')
-        return false
-      } finally {
-        setLoading(false)
-      }
-    },
-    [carregar],
-  )
+  const rows = query.data?.items ?? []
+  const total = query.data?.total ?? 0
+  const totalPages = Math.max(1, Math.ceil(total / perPage))
+  const safePage = Math.min(page, totalPages)
 
-  const deletar = useCallback(
-    async (id: number): Promise<boolean> => {
-      setError(null)
-      setLoading(true)
-      try {
-        await deleteRegistro(id)
-        await carregar()
-        return true
-      } catch (e) {
-        console.error('Erro ao deletar DELETE /fator-esocial/{id}', e)
-        setError('Não foi possível deletar o registro.')
-        return false
-      } finally {
-        setLoading(false)
-      }
-    },
-    [carregar],
-  )
+  const queryError = query.isError
+    ? 'Não foi possível carregar os registros do eSocial.'
+    : null
+
+  function invalidateLista() {
+    return queryClient.invalidateQueries({ queryKey: fatorEsocialKeys.all })
+  }
+
+  const criarMut = useMutation({
+    mutationFn: createSimulacao,
+    onSuccess: invalidateLista,
+  })
+
+  const atualizarMut = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: AtualizarRegistroPayload }) =>
+      updateRegistro(id, payload),
+    onSuccess: invalidateLista,
+  })
+
+  const deletarMut = useMutation({
+    mutationFn: deleteRegistro,
+    onSuccess: invalidateLista,
+  })
+
+  async function criar(payload: CriarSimulacaoPayload): Promise<boolean> {
+    setError(null)
+    try {
+      await criarMut.mutateAsync(payload)
+      return true
+    } catch (e) {
+      console.error('Erro ao criar POST /fator-esocial', e)
+      setError('Não foi possível salvar a simulação.')
+      return false
+    }
+  }
+
+  async function atualizar(
+    id: number,
+    payload: AtualizarRegistroPayload,
+  ): Promise<boolean> {
+    setError(null)
+    try {
+      await atualizarMut.mutateAsync({ id, payload })
+      return true
+    } catch (e) {
+      console.error('Erro ao editar PUT /fator-esocial/{id}', e)
+      setError('Não foi possível salvar a edição.')
+      return false
+    }
+  }
+
+  async function deletar(id: number): Promise<boolean> {
+    setError(null)
+    try {
+      await deletarMut.mutateAsync(id)
+      return true
+    } catch (e) {
+      console.error('Erro ao deletar DELETE /fator-esocial/{id}', e)
+      setError('Não foi possível deletar o registro.')
+      return false
+    }
+  }
+
+  const loading =
+    query.isFetching ||
+    criarMut.isPending ||
+    atualizarMut.isPending ||
+    deletarMut.isPending
 
   return {
     search,
@@ -121,13 +122,13 @@ export function useFatorEsocial() {
     page,
     setPage,
     loading,
-    error,
+    error: error ?? queryError,
     setError,
     rows,
     total,
     totalPages,
     safePage,
-    carregar,
+    carregar: () => void query.refetch(),
     criar,
     atualizar,
     deletar,

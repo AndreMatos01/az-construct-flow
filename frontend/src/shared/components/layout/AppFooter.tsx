@@ -1,3 +1,5 @@
+const currentYear = new Date().getFullYear()
+
 export function AppFooter() {
   return (
     <footer className="sticky bottom-0 z-50 w-full border-t border-slate-200/70 bg-white/70 backdrop-blur dark:border-white/10 dark:bg-slate-950/60">
@@ -9,7 +11,7 @@ export function AppFooter() {
           : (11) 99999-9999 · contato@azconstructflow.com
         </div>
         <div>
-          © {new Date().getFullYear()} AZ ConstructFlow. Todos os direitos
+          © {currentYear} AZ ConstructFlow. Todos os direitos
           reservados.
         </div>
       </div>

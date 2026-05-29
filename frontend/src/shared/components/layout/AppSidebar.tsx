@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { ROOT_ROUTES, SIMULADOR_ROUTES } from '@/config/routes'
 
+const currentYear = new Date().getFullYear()
+
 type Props = {
   open: boolean
   onClose: () => void
@@ -115,7 +117,7 @@ export function AppSidebar({ open, onClose }: Props) {
 
         <div className="mt-auto p-3">
           <div className="text-xs text-slate-500 dark:text-slate-400">
-            © {new Date().getFullYear()} AZ ConstructFlow
+            © {currentYear} AZ ConstructFlow
           </div>
         </div>
       </aside>

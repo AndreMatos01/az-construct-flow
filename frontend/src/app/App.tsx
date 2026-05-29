@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useIsFetching, useQueryClient } from '@tanstack/react-query'
 import { useLocation } from 'react-router-dom'
 import { AppRouter } from '@/app/router'
 import { AppShell } from '@/shared/components/layout/AppShell'
 import { useActiveRoute, useSidebar, useTheme } from '@/shared/hooks'
-import { requestRefreshCalculos } from '@/shared/lib/refreshCalculos'
+import { calculosKeys } from '@/shared/lib/queryKeys'
 
 function isObrasRoute(pathname: string) {
   return pathname === '/obras' || pathname === '/dashboard'
@@ -14,34 +14,27 @@ export function App() {
   const { open: sidebarOpen, openSidebar, closeSidebar } = useSidebar()
   const activeRoute = useActiveRoute()
   const location = useLocation()
+  const queryClient = useQueryClient()
   const onObrasRoute = isObrasRoute(location.pathname)
-  const [calculosLoading, setCalculosLoading] = useState(false)
-
-  useEffect(() => {
-    function onLoading(event: Event) {
-      setCalculosLoading(Boolean((event as CustomEvent<boolean>).detail))
-    }
-    window.addEventListener('azcf:calculos-loading', onLoading)
-    return () => window.removeEventListener('azcf:calculos-loading', onLoading)
-  }, [])
+  const calculosFetching = useIsFetching({ queryKey: calculosKeys.all })
 
   return (
     <AppShell
       subtitle={activeRoute.label}
       tema={tema}
-      loading={onObrasRoute && calculosLoading}
+      loading={onObrasRoute && calculosFetching > 0}
       apiError={null}
       sidebarOpen={sidebarOpen}
       onOpenMenu={openSidebar}
       onCloseSidebar={closeSidebar}
       onToggleTema={toggleTema}
       onRefresh={() => {
-        if (onObrasRoute) requestRefreshCalculos()
+        if (onObrasRoute) {
+          void queryClient.invalidateQueries({ queryKey: calculosKeys.all })
+        }
       }}
     >
       <AppRouter />
     </AppShell>
   )
 }
-
-export default App

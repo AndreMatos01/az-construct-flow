@@ -1,58 +1,7 @@
-import { ChevronDown, CircleHelp, Plus } from 'lucide-react'
+import { ChevronDown, Plus } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-type FieldProps = {
-  label: string
-  required?: boolean
-  info?: boolean
-  error?: string | null
-  children: ReactNode
-  className?: string
-}
-
-export function ObraFormField({
-  label,
-  required,
-  info,
-  error,
-  children,
-  className = '',
-}: FieldProps) {
-  return (
-    <div className={className}>
-      <div className="mb-2 flex items-center gap-1.5">
-        {required ? (
-          <span
-            className="text-sm font-medium text-rose-500 dark:text-rose-400"
-            aria-hidden="true"
-          >
-            *
-          </span>
-        ) : null}
-        <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
-          {label}
-        </span>
-        {info ? (
-          <CircleHelp
-            className="size-3.5 shrink-0 text-slate-400 dark:text-slate-500"
-            aria-label="Mais informações"
-          />
-        ) : null}
-      </div>
-      {children}
-      {error ? (
-        <p
-          className="mt-1.5 text-xs text-rose-600 dark:text-rose-400"
-          role="alert"
-        >
-          {error}
-        </p>
-      ) : null}
-    </div>
-  )
-}
-
-type AccordionProps = {
+type FormAccordionProps = {
   title: string
   open: boolean
   onToggle: () => void
@@ -60,13 +9,13 @@ type AccordionProps = {
   trailingIcon?: 'plus' | 'chevron'
 }
 
-export function ObraFormAccordion({
+export function FormAccordion({
   title,
   open,
   onToggle,
   children,
   trailingIcon = 'chevron',
-}: AccordionProps) {
+}: FormAccordionProps) {
   return (
     <div className="overflow-hidden rounded-xl bg-white ring-1 ring-slate-200/70 dark:bg-white/5 dark:ring-white/10">
       <button
@@ -104,7 +53,7 @@ export function ObraFormAccordion({
 }
 
 /** Linha clicável no estilo do acordeão (abre modal ou ação externa). */
-export function ObraFormAccordionTrigger({
+export function FormAccordionTrigger({
   title,
   onClick,
   trailingIcon = 'plus',
