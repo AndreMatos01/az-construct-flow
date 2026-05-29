@@ -9,9 +9,9 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { api } from '../api/client'
-import type { FatorESocialPageResponse, FatorESocialRow, FatorESocialStatus } from '../types/fatorEsocial'
-import { brl, parsePtBrNumber } from '../utils/format'
+import { api } from '@/shared/api/client'
+import type { FatorESocialPageResponse, FatorESocialRow, FatorESocialStatus } from '@/types/fatorEsocial'
+import { brl, parsePtBrNumber } from '@/shared/lib/format'
 
 function chipStatusClasses(status: FatorESocialStatus) {
   if (status === 'LEAD_QUENTE') {
