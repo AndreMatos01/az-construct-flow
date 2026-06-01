@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.az.dataflow.domain.entity.CalculoSero;
+import com.az.dataflow.domain.enums.Estado;
+import com.az.dataflow.domain.enums.ObraDestinacao;
+import com.az.dataflow.domain.enums.ObraTipo;
+import com.az.dataflow.domain.enums.TipoPessoa;
 import com.az.dataflow.dto.request.CalculoSeroRequest;
 import com.az.dataflow.dto.response.CalculoSeroResponse;
 import com.az.dataflow.dto.response.PageResponse;
@@ -24,6 +28,9 @@ public class CalculoSeroService {
 
     @Inject
     CalculoSeroMapper mapper;
+    
+    private static final double LIMITE_AREA_FAMILIAR_M2 = 1000.0;
+    private static final double LIMITE_AREA_COMERCIAL_SALAS_LOJAS_M2 = 3000.0;
 
     public PageResponse<CalculoSeroResponse> listar(
             String nomeObra, String nomeCliente, String cpf, String telefone,
@@ -87,18 +94,70 @@ public class CalculoSeroService {
      * Substitua pela fórmula oficial (tabelas de CUB, fatores por destinação/estado, etc.).
      */
     private static void aplicarCalculo(CalculoSero e) {
-        double areaTotal = e.areaPrincipal + e.areaPiscinaDescoberta;
+        double areaEquivalente = percentualEquivalencia(e.destinacao, e.areaPrincipal) * e.areaPrincipal;
+        double areaTotal = areaEquivalente;
+        double valoCod = calculoCod(e.estado, areaTotal);
+        double valorBase = e.tipoPessoa == TipoPessoa.PF ? valoCod * fatorSocial(areaTotal) : valoCod;
+        double RMT = valorBase * fatorTipo(e.tipoObra);
+        double aliquota = buscaValorAliquota(e.tipoPessoa);
+       e.valorInss = round2(RMT * aliquota);
+       e.baseCalculo = RMT;
+    }
 
-        double fatorTipo = switch (e.tipoObra) {
-            case ALVENARIA, ALVENARIA_PROJETO_SOCIAL -> 1.0;
-            case MADEIRA, MISTA, MISTA_MADEIRA_PROJETO_SOCIAL -> 0.8;
+    /** Fator de equivalência por destinação (tabela SERO). */
+    private static double percentualEquivalencia(ObraDestinacao destinacao, double areaPrincipal) {
+        return switch (destinacao) {
+            case UNIFAMILIAR   -> areaPrincipal > LIMITE_AREA_FAMILIAR_M2 ? 0.85 : 0.89;
+            case MULTIFAMILIAR -> areaPrincipal > LIMITE_AREA_FAMILIAR_M2 ? 0.86 : 0.90;
+            case COMERCIAL_SALAS_LOJAS, EDIFICIO_GARAGEM  -> areaPrincipal > LIMITE_AREA_COMERCIAL_SALAS_LOJAS_M2 ? 0.83 : 0.86;
+            case  GALPAO_INDUSTRIAL -> 0.95;
+            case CASA_POPULAR, CONJUNTO_HABITACIONAL_POPULAR -> 0.98;
         };
-        double fatorConcreto = e.concretoUsinado ? 0.9 : 1.0;
-        double aliquota = 0.20; // 20% — exemplo
+    }
 
-        double base = round2(areaTotal * fatorTipo * fatorConcreto);
-        e.baseCalculo = base;
-        e.valorInss = round2(base * aliquota);
+     /** Valor Aliquota (tabela SERO). */
+     private static double buscaValorAliquota(TipoPessoa tipoPessoa) {
+        return switch (tipoPessoa) {
+            case PF -> 0.368;
+            case PJ -> 0.368;
+            default -> 0.0;
+        };
+    }
+
+    /** COD (tabela SERO). */
+    private static double calculoCod(Estado estado, double areaPrincipal) {
+        return buscaVau(estado) * areaPrincipal;
+    }
+
+    /** COD (tabela SERO). */
+    private static double buscaVau(Estado estado) {
+        return 2391.01;
+    }
+    /** Fator Social (tabela SERO). */
+    private static double fatorSocial(double areaPrincipal) {
+        if (areaPrincipal > 400) {
+            return 0.90;
+        }
+        if (areaPrincipal > 300) {
+            return 0.70;
+        }
+        if (areaPrincipal > 200) {
+            return 0.55;
+        }
+        if (areaPrincipal > 100) {
+            return 0.45;
+        }
+        return 0.20; // <= 100
+    }
+    
+    /** Fator Tipo (tabela SERO). */
+    private static double fatorTipo(ObraTipo tipoObra) {
+        return switch (tipoObra) {
+            case ALVENARIA -> 0.20;
+            case MADEIRA, MISTA -> 0.15;
+            case ALVENARIA_PROJETO_SOCIAL -> 0.12;
+            case MISTA_MADEIRA_PROJETO_SOCIAL -> 0.07;
+        };
     }
 
     private static void validar(CalculoSeroRequest req) {
