@@ -1,12 +1,6 @@
-import {
-  Calculator,
-  Coins,
-  FileSliders,
-  LayoutDashboard,
-  type LucideIcon,
-} from 'lucide-react'
+import { Coins, FileSliders, type LucideIcon } from 'lucide-react'
 
-export type RouteId = 'dash' | 'inss-obras' | 'fator-esocial' | 'calculo-sero'
+export type RouteId = 'fator-esocial' | 'calculo-sero'
 
 export type RouteConfig = {
   id: RouteId
@@ -18,21 +12,6 @@ export type RouteConfig = {
 }
 
 export const ROUTES: RouteConfig[] = [
-  {
-    id: 'dash',
-    path: '/dashboard',
-    label: 'Dashboard',
-    icon: LayoutDashboard,
-    group: 'root',
-  },
-  {
-    id: 'inss-obras',
-    path: '/obras',
-    label: 'Obras contratuais',
-    icon: Calculator,
-    group: 'simuladores',
-    navVariant: 'neutral',
-  },
   {
     id: 'fator-esocial',
     path: '/esocial',
@@ -49,7 +28,7 @@ export const ROUTES: RouteConfig[] = [
   },
 ]
 
-export const DEFAULT_ROUTE_PATH = '/obras'
+export const DEFAULT_ROUTE_PATH = '/sero'
 
 export const ROOT_ROUTES = ROUTES.filter((r) => r.group === 'root')
 export const SIMULADOR_ROUTES = ROUTES.filter((r) => r.group === 'simuladores')
@@ -59,5 +38,5 @@ export function findRouteByPath(pathname: string): RouteConfig | undefined {
 }
 
 export function getDefaultRoute(): RouteConfig {
-  return findRouteByPath(DEFAULT_ROUTE_PATH) ?? ROUTES[1]
+  return findRouteByPath(DEFAULT_ROUTE_PATH) ?? ROUTES[0]
 }

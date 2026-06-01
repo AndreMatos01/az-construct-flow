@@ -3,12 +3,6 @@ import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { DEFAULT_ROUTE_PATH } from '@/config/routes'
 
-const ObrasContratuaisPage = lazy(() =>
-  import('@/features/calculos-inss').then((m) => ({
-    default: m.ObrasContratuaisPage,
-  })),
-)
-
 const FatorEsocialPage = lazy(() =>
   import('@/features/fator-esocial').then((m) => ({
     default: m.FatorEsocialPage,
@@ -39,8 +33,6 @@ export function AppRouter() {
     <Suspense fallback={<RouteFallback />}>
       <Routes>
         <Route path="/" element={<Navigate to={DEFAULT_ROUTE_PATH} replace />} />
-        <Route path="/dashboard" element={<ObrasContratuaisPage />} />
-        <Route path="/obras" element={<ObrasContratuaisPage />} />
         <Route
           path="/esocial"
           element={

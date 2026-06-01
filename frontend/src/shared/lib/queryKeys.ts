@@ -1,7 +1,3 @@
-export const calculosKeys = {
-  all: ['calculos'] as const,
-}
-
 export type FatorEsocialListParams = {
   q: string
   page: number
