@@ -95,12 +95,22 @@ public class CalculoSeroService {
      * Substitua pela fórmula oficial (tabelas de CUB, fatores por destinação/estado, etc.).
      */
     private static void aplicarCalculo(CalculoSero e) {
-        double areaEquivalente = percentualEquivalencia(e.destinacao, e.areaPrincipal) * e.areaPrincipal;
-        double areaTotal = areaEquivalente;
-        double valoCod = calculoCod(e.estado, e.destinacao, areaTotal);
-        double valorBase = e.tipoPessoa == TipoPessoa.PF ? valoCod * fatorSocial(areaTotal) : valoCod;
+        double percentualEquivalente = percentualEquivalencia(e.destinacao, e.areaPrincipal);
+        System.err.println("percentualEquivalente: " + percentualEquivalente);
+        double areaEquivalente = percentualEquivalente * e.areaPrincipal;
+        System.err.println("areaEquivalente: " + areaEquivalente);
+        double valorVau = buscaVau(e.estado, e.destinacao);
+        System.err.println("valorVau: " + valorVau);
+        double valorCod = valorVau * areaEquivalente;
+        System.err.println("valorCod: " + valorCod);
+        double fatorSocial = fatorSocial(areaEquivalente);
+        System.err.println("fatorSocial: " + fatorSocial);
+        double valorBase = e.tipoPessoa == TipoPessoa.PF ? valorCod * fatorSocial : valorCod;
+        System.err.println("valorBase: " + valorBase);
         double RMT = valorBase * fatorTipo(e.tipoObra);
+        System.err.println("RMT: " + RMT);
         double aliquota = buscaValorAliquota(e.tipoPessoa);
+        System.err.println("aliquota: " + aliquota);
        e.valorInss = round2(RMT * aliquota);
        e.baseCalculo = RMT;
     }
@@ -123,11 +133,6 @@ public class CalculoSeroService {
             case PJ -> 0.368;
             default -> 0.0;
         };
-    }
-
-    /** COD (tabela SERO). */
-    private static double calculoCod(Estado estado, ObraDestinacao destinacao, double areaPrincipal) {
-        return buscaVau(estado, destinacao) * areaPrincipal;
     }
 
     /** Busca o valor VAU mais recente para o estado e a destinação informados. */
@@ -155,7 +160,7 @@ public class CalculoSeroService {
             return 0.55;
         }
         if (areaPrincipal > 100) {
-            return 0.45;
+            return 0.40;
         }
         return 0.20; // <= 100
     }
