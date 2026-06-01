@@ -12,7 +12,8 @@ export type CalculoSeroRow = {
   cpf: string
   telefone: string
   areaPrincipal: number
-  areaPiscinaDescoberta: number
+  areaComplementarDescoberta: number
+  areaComplementarCoberta: number
   destinacao: DestinacaoValue
   tipoObra: TipoObraValue
   concretoUsinado: boolean
@@ -36,7 +37,8 @@ export type CalculoSeroPayload = {
   cpf: string
   telefone: string
   areaPrincipal: number
-  areaPiscinaDescoberta: number
+  areaComplementarDescoberta: number
+  areaComplementarCoberta: number
   destinacao: DestinacaoValue
   tipoObra: TipoObraValue
   concretoUsinado: boolean

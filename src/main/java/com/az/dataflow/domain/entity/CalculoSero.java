@@ -37,7 +37,10 @@ public class CalculoSero extends PanacheEntity {
     public Double areaPrincipal;
 
     @Column(nullable = false)
-    public Double areaPiscinaDescoberta;
+    public Double areaComplementarDescoberta;
+
+    @Column(nullable = false)
+    public Double areaComplementarCoberta;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -44,8 +44,11 @@ export function CalculoSeroForm({
   const [areaPrincipalStr, setAreaPrincipalStr] = useState(() =>
     numeroPtBr(initial?.areaPrincipal),
   )
-  const [areaPiscinaStr, setAreaPiscinaStr] = useState(() =>
-    numeroPtBr(initial?.areaPiscinaDescoberta),
+  const [areaCompDescStr, setAreaCompDescStr] = useState(() =>
+    numeroPtBr(initial?.areaComplementarDescoberta),
+  )
+  const [areaCompCobStr, setAreaCompCobStr] = useState(() =>
+    numeroPtBr(initial?.areaComplementarCoberta),
   )
   const [destinacao, setDestinacao] = useState<DestinacaoValue>(
     initial?.destinacao ?? 'UNIFAMILIAR',
@@ -67,8 +70,11 @@ export function CalculoSeroForm({
 
   function submeter() {
     const areaPrincipal = parsePtBrNumber(areaPrincipalStr)
-    const areaPiscina = areaPiscinaStr.trim()
-      ? parsePtBrNumber(areaPiscinaStr)
+    const areaCompDesc = areaCompDescStr.trim()
+      ? parsePtBrNumber(areaCompDescStr)
+      : 0
+    const areaCompCob = areaCompCobStr.trim()
+      ? parsePtBrNumber(areaCompCobStr)
       : 0
 
     if (!nomeObra.trim()) return onValidationError('Informe o nome da obra.')
@@ -77,8 +83,10 @@ export function CalculoSeroForm({
     if (!telefone.trim()) return onValidationError('Informe o telefone.')
     if (!Number.isFinite(areaPrincipal) || areaPrincipal <= 0)
       return onValidationError('Informe a área principal (m²) corretamente.')
-    if (!Number.isFinite(areaPiscina) || areaPiscina < 0)
-      return onValidationError('Informe a área da piscina (m²) corretamente.')
+    if (!Number.isFinite(areaCompDesc) || areaCompDesc < 0)
+      return onValidationError('Informe a área complementar descoberta (m²) corretamente.')
+    if (!Number.isFinite(areaCompCob) || areaCompCob < 0)
+      return onValidationError('Informe a área complementar coberta (m²) corretamente.')
     if (!dataInicio) return onValidationError('Informe a data de início da obra.')
     if (!dataFim) return onValidationError('Informe a data final da obra.')
     if (dataFim < dataInicio)
@@ -90,7 +98,8 @@ export function CalculoSeroForm({
       cpf: cpf.trim(),
       telefone: telefone.trim(),
       areaPrincipal,
-      areaPiscinaDescoberta: areaPiscina,
+      areaComplementarDescoberta: areaCompDesc,
+      areaComplementarCoberta: areaCompCob,
       destinacao,
       tipoObra,
       concretoUsinado,
@@ -155,12 +164,22 @@ export function CalculoSeroForm({
           />
         </FormField>
 
-        <FormField label="Área Piscina Descoberta (m²):">
+        <FormField label="Área Complementar Descoberta (m²):">
           <input
             className={fieldClass}
             inputMode="decimal"
-            value={areaPiscinaStr}
-            onChange={(e) => setAreaPiscinaStr(e.target.value)}
+            value={areaCompDescStr}
+            onChange={(e) => setAreaCompDescStr(e.target.value)}
+            placeholder="0,00"
+          />
+        </FormField>
+
+        <FormField label="Área Complementar Coberta (m²):">
+          <input
+            className={fieldClass}
+            inputMode="decimal"
+            value={areaCompCobStr}
+            onChange={(e) => setAreaCompCobStr(e.target.value)}
             placeholder="0,00"
           />
         </FormField>
@@ -231,8 +250,6 @@ export function CalculoSeroForm({
             ))}
           </select>
         </FormField>
-
-        <div className="hidden md:block" aria-hidden="true" />
 
         <FormField label="Data de Início da Obra:" required>
           <input
