@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.az.dataflow.domain.entity.CalculoSero;
+import com.az.dataflow.domain.entity.Vau;
 import com.az.dataflow.domain.enums.Estado;
 import com.az.dataflow.domain.enums.ObraDestinacao;
 import com.az.dataflow.domain.enums.ObraTipo;
@@ -96,7 +97,7 @@ public class CalculoSeroService {
     private static void aplicarCalculo(CalculoSero e) {
         double areaEquivalente = percentualEquivalencia(e.destinacao, e.areaPrincipal) * e.areaPrincipal;
         double areaTotal = areaEquivalente;
-        double valoCod = calculoCod(e.estado, areaTotal);
+        double valoCod = calculoCod(e.estado, e.destinacao, areaTotal);
         double valorBase = e.tipoPessoa == TipoPessoa.PF ? valoCod * fatorSocial(areaTotal) : valoCod;
         double RMT = valorBase * fatorTipo(e.tipoObra);
         double aliquota = buscaValorAliquota(e.tipoPessoa);
@@ -125,13 +126,22 @@ public class CalculoSeroService {
     }
 
     /** COD (tabela SERO). */
-    private static double calculoCod(Estado estado, double areaPrincipal) {
-        return buscaVau(estado) * areaPrincipal;
+    private static double calculoCod(Estado estado, ObraDestinacao destinacao, double areaPrincipal) {
+        return buscaVau(estado, destinacao) * areaPrincipal;
     }
 
-    /** COD (tabela SERO). */
-    private static double buscaVau(Estado estado) {
-        return 2391.01;
+    /** Busca o valor VAU mais recente para o estado e a destinação informados. */
+    private static double buscaVau(Estado estado, ObraDestinacao destinacao) {
+        Vau vau = Vau.buscarMaisRecente(estado);
+        if (vau == null) {
+            throw new NotFoundException("VAU não encontrado para o estado " + estado + ".");
+        }
+        Double valor = vau.valorPara(destinacao);
+        if (valor == null) {
+            throw new BadRequestException(
+                    "VAU sem valor para a destinação " + destinacao + " no período " + vau.periodo + ".");
+        }
+        return valor;
     }
     /** Fator Social (tabela SERO). */
     private static double fatorSocial(double areaPrincipal) {
