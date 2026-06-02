@@ -1,4 +1,5 @@
 import type {
+  CategoriaObraValue,
   DestinacaoValue,
   EstadoValue,
   TipoObraValue,
@@ -12,10 +13,9 @@ export type CalculoSeroRow = {
   cpf: string
   telefone: string
   areaPrincipal: number
-  areaComplementarDescoberta: number
-  areaComplementarCoberta: number
   destinacao: DestinacaoValue
   tipoObra: TipoObraValue
+  categoriaObra: CategoriaObraValue
   concretoUsinado: boolean
   estado: EstadoValue
   tipoPessoa: TipoPessoaValue
@@ -37,10 +37,9 @@ export type CalculoSeroPayload = {
   cpf: string
   telefone: string
   areaPrincipal: number
-  areaComplementarDescoberta: number
-  areaComplementarCoberta: number
   destinacao: DestinacaoValue
   tipoObra: TipoObraValue
+  categoriaObra: CategoriaObraValue
   concretoUsinado: boolean
   estado: EstadoValue
   tipoPessoa: TipoPessoaValue

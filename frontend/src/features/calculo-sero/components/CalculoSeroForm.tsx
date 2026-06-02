@@ -6,9 +6,11 @@ import {
   ESTADOS_BR,
   TIPOS_OBRA,
   TIPOS_PESSOA,
+  CATEGORIA_OBRA,
   type DestinacaoValue,
   type EstadoValue,
   type TipoObraValue,
+  type CategoriaObraValue,
   type TipoPessoaValue,
 } from '@/shared/constants/obraOptions'
 import { parsePtBrNumber } from '@/shared/lib/format'
@@ -44,17 +46,15 @@ export function CalculoSeroForm({
   const [areaPrincipalStr, setAreaPrincipalStr] = useState(() =>
     numeroPtBr(initial?.areaPrincipal),
   )
-  const [areaCompDescStr, setAreaCompDescStr] = useState(() =>
-    numeroPtBr(initial?.areaComplementarDescoberta),
-  )
-  const [areaCompCobStr, setAreaCompCobStr] = useState(() =>
-    numeroPtBr(initial?.areaComplementarCoberta),
-  )
+  
   const [destinacao, setDestinacao] = useState<DestinacaoValue>(
     initial?.destinacao ?? 'UNIFAMILIAR',
   )
   const [tipoObra, setTipoObra] = useState<TipoObraValue>(
     initial?.tipoObra ?? 'ALVENARIA',
+  )
+  const [categoriaObra, setCategoriaObra] = useState<CategoriaObraValue>(
+    initial?.categoriaObra ?? 'NOVA',
   )
   const [concretoUsinado, setConcretoUsinado] = useState(
     initial?.concretoUsinado ?? false,
@@ -98,10 +98,9 @@ export function CalculoSeroForm({
       cpf: cpf.trim(),
       telefone: telefone.trim(),
       areaPrincipal,
-      areaComplementarDescoberta: areaCompDesc,
-      areaComplementarCoberta: areaCompCob,
       destinacao,
       tipoObra,
+      categoriaObra,
       concretoUsinado,
       estado,
       tipoPessoa,
@@ -164,26 +163,6 @@ export function CalculoSeroForm({
           />
         </FormField>
 
-        <FormField label="Área Complementar Descoberta (m²):">
-          <input
-            className={fieldClass}
-            inputMode="decimal"
-            value={areaCompDescStr}
-            onChange={(e) => setAreaCompDescStr(e.target.value)}
-            placeholder="0,00"
-          />
-        </FormField>
-
-        <FormField label="Área Complementar Coberta (m²):">
-          <input
-            className={fieldClass}
-            inputMode="decimal"
-            value={areaCompCobStr}
-            onChange={(e) => setAreaCompCobStr(e.target.value)}
-            placeholder="0,00"
-          />
-        </FormField>
-
         <FormField label="Destinação:" required>
           <select
             className={fieldClass}
@@ -197,6 +176,20 @@ export function CalculoSeroForm({
             ))}
           </select>
         </FormField>
+
+      <FormField label="Categoria da Obra:" required>
+        <select
+          className={fieldClass}
+          value={categoriaObra}
+          onChange={(e) => setCategoriaObra(e.target.value as CategoriaObraValue)}
+        >
+          {CATEGORIA_OBRA.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </FormField>
 
         <FormField label="Tipo de Obra:" required>
           <select

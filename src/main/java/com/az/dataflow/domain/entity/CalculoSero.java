@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.az.dataflow.domain.enums.Estado;
+import com.az.dataflow.domain.enums.ObraCategoria;
 import com.az.dataflow.domain.enums.ObraDestinacao;
 import com.az.dataflow.domain.enums.ObraTipo;
 import com.az.dataflow.domain.enums.TipoPessoa;
@@ -36,12 +37,6 @@ public class CalculoSero extends PanacheEntity {
     @Column(nullable = false)
     public Double areaPrincipal;
 
-    @Column(nullable = false)
-    public Double areaComplementarDescoberta;
-
-    @Column(nullable = false)
-    public Double areaComplementarCoberta;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     public ObraDestinacao destinacao;
@@ -49,6 +44,10 @@ public class CalculoSero extends PanacheEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     public ObraTipo tipoObra;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    public ObraCategoria categoriaObra;
 
     @Column(nullable = false)
     public boolean concretoUsinado;

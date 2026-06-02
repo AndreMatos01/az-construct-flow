@@ -21,10 +21,9 @@ public class CalculoSeroMapper {
         e.cpf = req.cpf().trim();
         e.telefone = req.telefone().trim();
         e.areaPrincipal = req.areaPrincipal();
-        e.areaComplementarDescoberta = req.areaComplementarDescoberta();
-        e.areaComplementarCoberta = req.areaComplementarCoberta();
         e.destinacao = req.destinacao();
         e.tipoObra = req.tipoObra();
+        e.categoriaObra = req.categoriaObra();
         e.concretoUsinado = Boolean.TRUE.equals(req.concretoUsinado());
         e.estado = req.estado();
         e.tipoPessoa = req.tipoPessoa();
@@ -40,10 +39,9 @@ public class CalculoSeroMapper {
                 e.cpf,
                 e.telefone,
                 e.areaPrincipal,
-                e.areaComplementarDescoberta,
-                e.areaComplementarCoberta,
                 e.destinacao,
                 e.tipoObra,
+                e.categoriaObra,
                 e.concretoUsinado,
                 e.estado,
                 e.tipoPessoa,

@@ -43,8 +43,6 @@ function buildHtml(r: CalculoSeroRow): string {
       ${linha('CPF', r.cpf)}
       ${linha('Telefone', r.telefone)}
       ${linha('Área principal', `${r.areaPrincipal.toLocaleString('pt-BR')} m²`)}
-      ${linha('Área complementar descoberta', `${r.areaComplementarDescoberta.toLocaleString('pt-BR')} m²`)}
-      ${linha('Área complementar coberta', `${r.areaComplementarCoberta.toLocaleString('pt-BR')} m²`)}
       ${linha('Destinação', destinacaoLabel(r.destinacao))}
       ${linha('Tipo de obra', tipoObraLabel(r.tipoObra))}
       ${linha('Concreto usinado', r.concretoUsinado ? 'Sim' : 'Não')}

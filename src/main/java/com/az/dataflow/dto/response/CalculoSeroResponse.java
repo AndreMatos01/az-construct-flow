@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.az.dataflow.domain.enums.Estado;
+import com.az.dataflow.domain.enums.ObraCategoria;
 import com.az.dataflow.domain.enums.ObraDestinacao;
 import com.az.dataflow.domain.enums.ObraTipo;
 import com.az.dataflow.domain.enums.TipoPessoa;
@@ -15,10 +16,9 @@ public record CalculoSeroResponse(
         String cpf,
         String telefone,
         Double areaPrincipal,
-        Double areaComplementarDescoberta,
-        Double areaComplementarCoberta,
         ObraDestinacao destinacao,
         ObraTipo tipoObra,
+        ObraCategoria categoriaObra,
         boolean concretoUsinado,
         Estado estado,
         TipoPessoa tipoPessoa,

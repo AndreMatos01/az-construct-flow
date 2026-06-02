@@ -3,6 +3,7 @@ package com.az.dataflow.dto.request;
 import java.time.LocalDate;
 
 import com.az.dataflow.domain.enums.Estado;
+import com.az.dataflow.domain.enums.ObraCategoria;
 import com.az.dataflow.domain.enums.ObraDestinacao;
 import com.az.dataflow.domain.enums.ObraTipo;
 import com.az.dataflow.domain.enums.TipoPessoa;
@@ -18,10 +19,9 @@ public record CalculoSeroRequest(
         @NotBlank String cpf,
         @NotBlank String telefone,
         @NotNull @Positive Double areaPrincipal,
-        @NotNull @PositiveOrZero Double areaComplementarDescoberta,
-        @NotNull @PositiveOrZero Double areaComplementarCoberta,
         @NotNull ObraDestinacao destinacao,
         @NotNull ObraTipo tipoObra,
+        @NotNull ObraCategoria categoriaObra,
         @NotNull Boolean concretoUsinado,
         @NotNull Estado estado,
         @NotNull TipoPessoa tipoPessoa,

@@ -33,11 +33,17 @@ export const DESTINACOES_OBRA = [
   { value: 'MULTIFAMILIAR', label: 'Residência Multifamiliar' },
   { value: 'COMERCIAL_SALAS_LOJAS', label: 'Comercial - Salas e Lojas' },
   { value: 'GALPAO_INDUSTRIAL', label: 'Galpão Industrial' },
+  { value: 'CASA_POPULAR', label: 'Casa Popular' },
+  { value: 'CONJUNTO_HABITACIONAL_POPULAR', label: 'Conjunto Habitacional Popular' },
+  { value: 'EDIFICIO_GARAGEM', label: 'Edifício Garagem' },
 ] as const
 
 export const TIPOS_OBRA = [
   { value: 'ALVENARIA', label: 'Alvenaria' },
-  { value: 'MISTA', label: 'Madeira/Mista' },
+  { value: 'MADEIRA', label: 'Madeira' },
+  { value: 'MISTA', label: 'Mista' },
+  { value: 'ALVENARIA_PROJETO_SOCIAL', label: 'Alvenaria Interesse Social' },
+  { value: 'MISTA_MADEIRA_PROJETO_SOCIAL', label: 'Mista/Madeira Interesse Social")' },
 ] as const
 
 export const TIPOS_PESSOA = [
@@ -45,7 +51,14 @@ export const TIPOS_PESSOA = [
   { value: 'PJ', label: 'Pessoa Jurídica' },
 ] as const
 
+export const CATEGORIA_OBRA = [
+  { value: 'NOVA', label: 'Nova' },
+  { value: 'REFORMA', label: 'Reforma' },
+  { value: 'DEMOLICAO', label: 'Demolição' },
+] as const
+
 export type EstadoValue = (typeof ESTADOS_BR)[number]['value']
 export type DestinacaoValue = (typeof DESTINACOES_OBRA)[number]['value']
 export type TipoObraValue = (typeof TIPOS_OBRA)[number]['value']
+export type CategoriaObraValue = (typeof CATEGORIA_OBRA)[number]['value']
 export type TipoPessoaValue = (typeof TIPOS_PESSOA)[number]['value']
