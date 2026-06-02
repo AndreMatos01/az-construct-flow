@@ -70,12 +70,6 @@ export function CalculoSeroForm({
 
   function submeter() {
     const areaPrincipal = parsePtBrNumber(areaPrincipalStr)
-    const areaCompDesc = areaCompDescStr.trim()
-      ? parsePtBrNumber(areaCompDescStr)
-      : 0
-    const areaCompCob = areaCompCobStr.trim()
-      ? parsePtBrNumber(areaCompCobStr)
-      : 0
 
     if (!nomeObra.trim()) return onValidationError('Informe o nome da obra.')
     if (!nomeCliente.trim()) return onValidationError('Informe o nome do cliente.')
@@ -83,10 +77,6 @@ export function CalculoSeroForm({
     if (!telefone.trim()) return onValidationError('Informe o telefone.')
     if (!Number.isFinite(areaPrincipal) || areaPrincipal <= 0)
       return onValidationError('Informe a área principal (m²) corretamente.')
-    if (!Number.isFinite(areaCompDesc) || areaCompDesc < 0)
-      return onValidationError('Informe a área complementar descoberta (m²) corretamente.')
-    if (!Number.isFinite(areaCompCob) || areaCompCob < 0)
-      return onValidationError('Informe a área complementar coberta (m²) corretamente.')
     if (!dataInicio) return onValidationError('Informe a data de início da obra.')
     if (!dataFim) return onValidationError('Informe a data final da obra.')
     if (dataFim < dataInicio)
